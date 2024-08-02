@@ -1,0 +1,19 @@
+---
+- name: Run command on remote hosts
+  hosts: all
+  become: true
+
+  vars:
+    command: "sudo grep 'Accepted' /var/log/secure* | awk '{print $0}'"
+    output_dir: "/home/ec2-user/reports"
+
+  tasks:
+    - name: Run command
+      shell: "{{ command }}"
+      register: command_output
+
+    - name: Save output to file
+      local_action:
+        module: copy
+        content: "{{ command_output.stdout }}"
+        dest: "{{ output_dir }}/{{ inventory_hostname }}.log"

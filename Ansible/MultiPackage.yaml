@@ -1,0 +1,13 @@
+---
+- name: Install Common Applications
+  hosts: all
+  become: true
+  tasks:
+    - name: Install common packages
+      yum:
+        name:
+          - bind-utils
+          - screen
+          - docker
+        state: present
+        update_cache: true

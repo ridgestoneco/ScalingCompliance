@@ -1,0 +1,33 @@
+---
+- name: Check network for hosts with port 22 open
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Run Nmap to scan for hosts with port 22 open
+      command: nmap -p 22 192.168.128.0/24 -oG -
+
+      register: nmap_output
+
+    - name: Parse Nmap output
+      set_fact:
+        open_hosts: "{{ nmap_output.stdout_lines | map('regex_replace', '^.*\\b(\\d+\\.\\d+\\.\\d+\\.\\d+)\\b.*Ports:.*22.*$', '\\1') | list }}"
+
+    - name: Add open hosts to specific host file
+      lineinfile:
+        path: /home/ec2-user/hosts4      
+        line: "{{ item | regex_replace('^(\\d+\\.\\d+\\.\\d+\\.\\d+).*$','\\1') }}"
+        state: present
+      with_items: "{{ open_hosts }}"
+
+    - name: Remove extra text from file
+      lineinfile:
+        path: /home/ec2-user/hosts4
+        state: absent
+        regexp: '^Host.*'
+
+    - name: Remove comments from file
+      lineinfile:
+        path: /home/ec2-user/hosts4
+        state: absent
+        regexp: '^#.*'

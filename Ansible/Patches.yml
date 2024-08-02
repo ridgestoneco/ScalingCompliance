@@ -1,0 +1,11 @@
+---
+- name: Run Patches
+  hosts: all
+  tasks:
+    - name: Patches
+      yum:
+        name: '*'
+        state: latest
+        security: yes
+      become: yes
+

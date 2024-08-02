@@ -1,0 +1,29 @@
+---
+- name: Create a user and configure SSH and sudo access
+  hosts: all
+  become: true
+  vars:
+    new_user: "johnd"  # Replace with the desired username
+    user_ssh_key: "ssh-rsa AAAAB3Nza... your-ssh-key"  # Replace with the desired SSH public key
+
+  tasks:
+    - name: Create a user 'johnd' with a home directory and bash shell
+      ansible.builtin.user:
+        name: "{{ new_user }}"
+        create_home: yes
+        shell: /bin/bash
+
+    - name: Add user's SSH key
+      authorized_key:
+        user: "{{ new_user }}"
+        key: "{{ user_ssh_key }}"
+        state: present
+
+    - name: Add user to sudoers
+      lineinfile:
+        path: /etc/sudoers.d/cloud_sudoers
+        line: "{{ new_user }} ALL=(ALL) NOPASSWD:ALL"
+        create: yes
+        state: present
+        validate: 'visudo -cf %s'
+
