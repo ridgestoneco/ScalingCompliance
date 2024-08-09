@@ -5,7 +5,7 @@
 
 #This was not in the presentation but copies ssh activity from remote boxes.
 #It stores the ssh records in seperate text files where Ansible is run. Text files are named with host IP.
-#Great to see how often boxes are used and in incident response.
+#Great to see how often boxes are used as well as during incident response.
   vars:
     command: "sudo grep 'Accepted' /var/log/secure* | awk '{print $0}'"
     output_dir: "/home/ec2-user/reports"
